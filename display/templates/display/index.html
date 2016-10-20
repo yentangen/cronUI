@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+
+    <title>Cron Display</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="favicon.ico">
+
+    {% load staticfiles %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'display/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'display/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- Custom made CSS -->
+    <link href="{% static 'display/css/custom.css' %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    {% include "navbar.html" %}
+
+    <span id="top"></span>
+    <div class="jumbotron">
+      <h1>Server List</h1>
+      <input id="searchField" type="text">
+      
+      {% if result %}
+        {% if result == "success" %}
+          <div class="alert alert-success">
+        {% elif result == "failure" %}
+          <div class="alert alert-danger">
+        {% endif %}
+            <strong>{{ msg }}</strong>
+          </div>
+      {% endif %}
+      
+	  <form id="serverForm" method="post">
+	  {% csrf_token %}
+	      <table id="crontabTable" class="table">
+	        <thead>
+	          <tr>
+	            <th>Hostname</th>
+	            <th>Environment</th>
+	            <th>User</th>
+	            <th>Action</th>
+	          </tr>
+	        </thead>
+	        <tbody>
+	          {% for user in userList %}
+	          <tr>
+	            <td>{{ user.server.hostname }}</td>
+	            <td>{{ user.server.env }}</td>
+	            <td><a href="{% url 'display:show' user.server.hostname user.username %}"><b>{{ user.username }}</b></a></td>
+	            <td><input user-id="{{ user.id }}" class="btn btn-primary" name="SYNC"  type="submit" value="Sync" /> 
+	            <input user-id="{{ user.id }}" class="btn btn-danger" name="DEL"  type="submit" value="Delete" /></td>
+	          </tr>
+	          {% endfor %}
+	        </tbody>
+	      </table>
+      </form>
+    </div>
+
+    <script src="{% static 'display/js/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'display/js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'display/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="{% static 'display/js/custom.js' %}"></script>
+    
+    <script>
+    $( "input[name='DEL'], input[name='SYNC']" ).click(function( event ) {
+
+        var userid = $(this).attr("user-id"),
+        input = $("<input>")
+                     .attr("type", "hidden")
+                     .attr("name", "user-id").val(userid);
+        $("form#serverForm").append($(input));
+
+        $("form#serverForm").submit();
+      });
+    </script>
+    
+  </body>
+</html>

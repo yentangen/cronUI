@@ -1,0 +1,10 @@
+*.pyc
+db.sqlite3
+migrations
+.DS_Store
+.coverage
+.project
+.pydevproject
+.settings
+settings.py
+__init__.py
