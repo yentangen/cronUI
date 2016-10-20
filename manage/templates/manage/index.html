@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+
+    <title>Cron Display</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="favicon.ico">
+
+    {% load staticfiles %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'display/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'display/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- Custom made CSS -->
+    <link href="{% static 'display/css/custom.css' %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    {% include "navbar.html" %}
+
+    <span id="top"></span>
+    <div class="jumbotron">
+      <h1>Import Cron</h1>
+      {% if result == "Failure" %}
+        <div class="alert alert-danger">
+            <strong>{{ msg }}</strong>
+          {% for job in error %}
+            <br><strong>{{ job }}</strong>
+          {% endfor %}
+        </div>
+      {% elif result == "Success" %}
+        <div class="alert alert-success">
+          <strong>{{ msg }}</strong>
+        </div>
+      {% endif %}
+      <form action="{% url 'manage:index' %}" method="post">
+        {% csrf_token %}
+        <table>
+          {{ form.as_table }}
+        </table>
+        <input type="submit" value="Import" />
+      </form>
+    </div>
+
+    <script src="{% static 'display/js/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'display/js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'display/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="{% static 'display/js/custom.js' %}"></script>
+  </body>
+</html>

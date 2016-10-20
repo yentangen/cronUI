@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+
+    <title>Cron Display</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="favicon.ico">
+
+    {% load staticfiles %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'display/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'display/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- Custom made CSS -->
+    <link href="{% static 'display/css/custom.css' %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    {% include "navbar.html" %}
+
+    <span id="top"></span>
+    <div class="jumbotron">
+      <h1>{{ hostname }} / {{ username }}
+        <input user-id="{{ cronList.0.user.id }}" class="btn btn-primary" name="SYNC"  type="submit" value="Sync" />
+	      <input user-id="{{ cronList.0.user.id }}" class="btn btn-danger" name="REMOVE"  type="submit" value="Delete" />
+      </h1>
+
+      {% if result %}
+        {% if result == "success" %}
+          <div class="alert alert-success">
+        {% elif result == "failure" %}
+          <div class="alert alert-danger">
+        {% endif %}
+            <strong>{{ msg }}</strong>
+          </div>
+      {% endif %}
+
+      <!-- Button trigger modal -->
+      <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addJobModal">
+        Add Job..
+      </button>
+
+      <!-- addJobModal -->
+      <div class="modal fade" id="addJobModal" tabindex="-1" role="dialog" aria-labelledby="addJobModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <h4 class="modal-title" id="addJobModalLabel">Add Job..</h4>
+            </div>
+            <form method="post">
+              <div class="modal-body">
+                {% csrf_token %}
+                <table>
+		          <tr>
+		            <th>Server Name:</th>
+		            <td>
+		              {{ hostname }}
+		            </td>
+		          </tr>
+		          <tr>
+		            <th>User Name:</th>
+		            <td>
+		              {{ username }}
+		            </td>
+		          </tr>
+                  {{ form.as_table }}
+                </table>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="submit" name="ADD" value="Add job to crontab" class="btn btn-primary">Add</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <br><br>
+
+      <form id="jobForm" method="post">
+        {% csrf_token %}
+
+        <input id="searchField" type="text">
+        <br><br>
+		
+        <input class="btn btn-primary" name="DEL" type="submit" value="Remove Multiple From DB" />
+        <input class="btn btn-success" name="ON"  type="submit" value="Turn ON Jobs" />
+        <input class="btn btn-danger"  name="OFF" type="submit" value="turn OFF Jobs" />
+        <table id="jobTable" class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Time</th>
+              <th>Command</th>
+              <th>Comment</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for cron in cronList %}
+	              {% if not cron.active %}
+	              <tr class="danger">
+	              {% else %}
+	              <tr class="success">
+	              {% endif %}
+                <td><input type="checkbox" name="job" id="{{ cron.id }}" value="{{ cron.id }}"></td>
+                <td>{{ cron.minute }} {{ cron.hour }} {{ cron.day }} {{ cron.month }} {{ cron.weekday }}</td>
+                <td>{{ cron.command }}</td>
+                <td>{{ cron.comment }}</td>
+                <td><a name='delbtn' job-id="{{ cron.id }}" class="btn btn-primary"><i class="fa fa-trash-o fa-lg"></i> Remove from DB</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <input class="btn btn-primary" name="DEL"    type="submit" value="Remove Multiple From DB" />
+        <input class="btn btn-success" name="ON"  type="submit" value="Turn ON Jobs" />
+        <input class="btn btn-danger"  name="OFF" type="submit" value="turn OFF Jobs" />
+      </form>
+    </div>
+
+    <script src="{% static 'display/js/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'display/js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'display/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="{% static 'display/js/custom.js' %}"></script>
+
+    <script>
+    $( "a[name='delbtn']" ).click(function( event ) {
+      var jobId = $(this).attr("job-id"),
+      input = $("<input>")
+                   .attr("type", "hidden")
+                   .attr("name", "job").val(jobId);
+      input2 = $("<input>")
+                   .attr("type", "hidden")
+                   .attr("name", "DEL").val("delete");
+      $("form#jobForm").append($(input));
+      $("form#jobForm").append($(input2));
+
+      $("form#jobForm").submit();
+    });
+
+    $( "input[name='REMOVE'], input[name='SYNC']" ).click(function( event ) {
+
+        var userid = $(this).attr("user-id"),
+        input = $("<input>")
+                   .attr("type", "hidden")
+                   .attr("name", "user-id").val(userid);
+        input2 = $("<input>")
+			       .attr("type", "hidden")
+			       .attr("name", $(this).attr("name")).val($(this).attr("value"));
+        $("form#jobForm").append($(input));
+        $("form#jobForm").append($(input2));
+
+        $("form#jobForm").submit();
+      });
+    </script>
+
+  </body>
+</html>
+

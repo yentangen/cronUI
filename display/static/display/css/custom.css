@@ -1,0 +1,56 @@
+#sidebar-nav
+{
+  background-color:rgba(0,44,88,0.8);
+}
+
+.btn-pulldown {
+  background-color: transparent;
+  color: #007fff;
+  font-weight: 700;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.btn-pulldown:hover {
+  font-weight:700;
+  color:#FFF;
+  background-color:rgba(0,44,88,0);
+  transition:color .5s ease-in;
+}
+
+.dropdown-menu {
+  background-color: #2f5275;
+}
+
+.nav li a
+{
+  font-weight:700;
+  color:#007FFF;
+  transition:color .5s ease-in;
+}
+
+.nav li a:hover
+{
+  font-weight:700;
+  color:#FFF;
+  background-color:rgba(0,44,88,0);
+}
+
+.nav li.active a
+{
+  color:#900;
+  font-weight:700;
+}
+
+.navbar-toggle {
+  border: 1px solid #FFE212;
+}
+
+.navbar-logo {
+  background-image: url("../img/cron.jpg");
+  background-position: center center;
+  background-repeat: no-repeat;
+  float: left;
+  height: 59px;
+  width: 108px;
+}

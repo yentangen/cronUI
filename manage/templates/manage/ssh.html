@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+
+    <title>SSH Key Management</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="icon" href="favicon.ico">
+
+    {% load staticfiles %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'display/css/bootstrap.min.css' %}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="{% static 'display/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <!-- Custom made CSS -->
+    <link href="{% static 'display/css/custom.css' %}" rel="stylesheet">
+  </head>
+
+  <body>
+
+    {% include "navbar.html" %}
+
+    <span id="top"></span>
+    <div class="jumbotron">
+
+      <h1>Add SSH Key</h1>
+        {{ pkey }}
+      <h1>User list</h1>
+
+      {% if result %}
+        {% if result == "success" %}
+          <div class="alert alert-success">
+        {% elif result == "failure" %}
+          <div class="alert alert-danger">
+        {% endif %}
+            <strong>{{ msg }}</strong>
+          </div>
+      {% endif %}
+
+      <input id="searchField" type="text">
+
+      <form id="userForm" action="{% url 'manage:ssh' %}" method="post">
+        {% csrf_token %}
+        <table id="sshKeysTable" class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Hostname</th>
+                <th>Env</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for userObj in userList %}
+                <tr>
+                  <td><input type="checkbox" name="user" id="{{ userObj.id }}" value="{{ userObj.id }}"></td>
+                  <td>{{ userObj.server.hostname }}</td>
+                  <td>{{ userObj.username }}</td>
+                  <td><a name='testbtn' user-id="{{ userObj.id }}" class="btn btn-primary"><i class="fa fa-check-circle-o"></i> Test</a>
+                      <!-- <a name='delbtn' user-id="{{ userObj.id }}" class="btn btn-danger"><i class="fa fa-trash-o fa-lg"></i> Delete</a> -->
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+      </form>
+    </div>
+
+    <script src="{% static 'display/js/jquery-2.2.3.min.js' %}"></script>
+    <script src="{% static 'display/js/bootstrap.min.js' %}"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{% static 'display/js/ie10-viewport-bug-workaround.js' %}"></script>
+    <script src="{% static 'display/js/custom.js' %}"></script>
+
+    <script>
+    $( "a[name='testbtn']" ).click(function( event ) {
+      // Stop form from submitting normally
+      //event.preventDefault();
+      // var $form = $( this ),
+      // // csrf token
+      // tokenId = $('input[name=csrfmiddlewaretoken]').attr("value"),
+      // url = $form.attr( "action" );
+      var userId = $(this).attr("user-id"),
+      input = $("<input>")
+                   .attr("type", "hidden")
+                   .attr("name", "userid").val(userId);
+      input2 = $("<input>")
+                   .attr("type", "hidden")
+                   .attr("name", "action").val("test");
+      $("form#userForm").append($(input));
+      $("form#userForm").append($(input2));
+
+      $("form#userForm").submit();
+
+      // Append new input to form containing relevant information, then "submit" form
+      // var input = $("<input>")
+      //              .attr("type", "hidden")
+      //              .attr("name", "userid").val({{ userObj.id }});
+      // $('#userForm').append($(input));
+
+      // Send the data using post and refresh page
+      // $.post( url, { user: userId, csrfmiddlewaretoken: tokenId, action: action }, setTimeout(single_delete_callback, 500 ));
+    });
+
+    // function single_delete_callback() {
+    //   window.location = window.location.href;
+    // }
+    </script>
+
+  </body>
+</html>
